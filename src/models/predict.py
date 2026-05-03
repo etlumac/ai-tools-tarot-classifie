@@ -215,12 +215,23 @@ class TarotPredictor:
 
 
 def main():
-    """CLI: python -m src.models.predict 'Вернётся ли он ко мне?'"""
+    import argparse
     import sys
-    text = " ".join(sys.argv[1:]) if len(sys.argv) > 1 else "Вернётся ли он ко мне?"
-    predictor = TarotPredictor(model_type="logreg")
-    result = predictor.predict(text)[0]
+
+    parser = argparse.ArgumentParser(description="AI-Таролог: предсказание категории вопроса")
+    parser.add_argument("text", nargs="*", default=["Вернётся ли он ко мне?"], help="Текст вопроса")
+    parser.add_argument("-m", "--model",
+                        choices=["logreg", "fasttext", "catboost", "bert", "ensemble"],
+                        default="logreg", help="Модель для предсказания")
+    parser.add_argument("-t", "--threshold", type=float, default=0.0, help="Порог уверенности")
+    args = parser.parse_args()
+
+    text = " ".join(args.text)
+    predictor = TarotPredictor(model_type=args.model)
+    result = predictor.predict(text, confidence_threshold=args.threshold)[0]
+
     print(f"Текст:       {text}")
+    print(f"Модель:      {args.model}")
     print(f"Класс:       {result['label']}")
     print(f"Уверенность: {result['confidence']:.2%}")
     print("Вероятности:")

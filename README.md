@@ -190,7 +190,7 @@ poetry run train
 ### Предсказание через CLI
 
 ```bash
-poetry run predict "Вернётся ли он ко мне?"
+poetry run predict "Вернётся ли он ко мне?"  -m ensemble
 ```
 
 ---
