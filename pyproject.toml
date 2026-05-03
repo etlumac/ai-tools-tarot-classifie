@@ -1,0 +1,58 @@
+[tool.poetry]
+name = "tarot-classifier"
+version = "0.1.0"
+description = "AI-Таролог: классификатор тем вопросов"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+packages = [{ include = "src" }]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+pandas = "^2.1"
+numpy = "^1.26"
+scikit-learn = "^1.4"
+pymorphy3 = "^2.0"
+fasttext-wheel = "^0.9.2"
+catboost = "^1.2"
+transformers = "^4.40"
+torch = "^2.2"
+mlflow = "^2.12"
+sqlalchemy = "<2.0"
+psycopg2-binary = "^2.9"
+boto3 = "^1.34"          # для S3 артефактов MLflow
+apache-airflow = { version = "^2.9", optional = true }
+bentoml = { version = "^1.2", optional = true }
+onnx = { version = "^1.16", optional = true }
+skl2onnx = { version = "^1.17", optional = true }
+onnxruntime = { version = "^1.18", optional = true }
+locust = { version = "^2.24", optional = true }  # нагрузочное тестирование (Лаб 3)
+
+[tool.poetry.extras]
+airflow  = ["apache-airflow"]
+serving  = ["bentoml", "onnx", "skl2onnx", "onnxruntime"]
+loadtest = ["locust"]
+all      = ["apache-airflow", "bentoml", "onnx", "skl2onnx", "onnxruntime", "locust"]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+pytest-cov = "^5.0"
+black = "^24.0"
+ruff = "^0.4"
+ipykernel = "^6.29"
+
+[tool.poetry.scripts]
+train    = "src.training.train:main"
+predict  = "src.models.predict:main"
+serve    = "src.serving.bentoml_service:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "I"]

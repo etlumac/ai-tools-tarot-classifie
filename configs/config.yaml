@@ -1,0 +1,85 @@
+# configs/config.yaml
+# Единый конфиг проекта. Все пути и параметры меняются здесь.
+
+project:
+  name: tarot-classifier
+  version: "0.1.0"
+
+data:
+  spreadsheet_id: "1HUUrXxlB9QQ4VpcLNYNOwZMJZsww5c-dmQnvTHLejGs"
+  sheets:
+    love: love
+    self: self
+    social: social
+    health: health
+    career: career
+  labels: [love, self, social, health, career]
+  min_text_len: 5
+  # Путь к локальному CSV с данными (для инкрементальной загрузки)
+  raw_csv: "data/raw/questions.csv"
+  processed_csv: "data/processed/questions_lemm.csv"
+  increment_csv: "data/raw/increment.csv"
+
+split:
+  test_size: 0.30
+  val_size: 0.50   # от temp (итого val=15%, test=15%)
+  random_state: 42
+
+storage:
+  # PostgreSQL — основное хранилище обработанных данных
+  # Обоснование: структурированные данные (text + label + metadata),
+  # малый объём (~1-10k строк), нужны инкременты и дедупликация по ключу.
+  # S3 используется только для хранения артефактов MLflow.
+  postgres_url: "postgresql://tarot:tarot@localhost:5432/tarot_db"
+  table_name: "questions"
+  # S3 для MLflow артефактов (опционально, можно заменить на ./mlruns локально)
+  mlflow_tracking_uri: "http://localhost:5000"   # или "mlruns" для локального режима
+  mlflow_artifact_uri: "s3://tarot-mlflow-artifacts"  # или "./mlartifacts" локально
+
+models:
+  artifacts_dir: "models/"
+  logreg_path: "models/tfidf_logreg_v1.pkl"
+  fasttext_path: "models/fasttext_v1.bin"
+  catboost_path: "models/catboost_v1.cbm"
+  bert_path: "models/rubert_tiny2_tarot/"
+  onnx_logreg_path: "models/logreg.onnx"    # Лаб 3
+  onnx_bert_path: "models/bert.onnx"         # Лаб 3
+
+training:
+  logreg:
+    max_features_options: [3000, 5000, 8000]
+    ngram_range_options: [[1, 1], [1, 2]]
+    C_options: [0.1, 0.5, 1.0, 5.0]
+    class_weight_options: [null, "balanced"]
+    cv_folds: 3
+  fasttext:
+    dim: 100
+    epoch: 50
+    lr: 0.5
+    wordNgrams: 2
+    minn: 2
+    maxn: 6
+    loss: softmax
+    minCount: 1
+  catboost:
+    iterations: 500
+    learning_rate: 0.05
+    depth: 6
+    loss_function: MultiClass
+    eval_metric: Accuracy
+    early_stopping_rounds: 50
+    random_seed: 42
+  bert:
+    model_name: "cointegrated/rubert-tiny2"
+    max_len: 64
+    batch_size: 32
+    epochs: 15
+    lr: 3.0e-5
+    weight_decay: 0.01
+    warmup_ratio: 0.1
+
+serving:
+  host: "0.0.0.0"
+  port: 3000
+  model: "ensemble"   # logreg | fasttext | catboost | bert | ensemble
+  confidence_threshold: 0.50   # ниже — возвращать "uncertain"
