@@ -223,3 +223,28 @@ poetry run mlflow ui --port 5000
 - `ON CONFLICT DO NOTHING` обеспечивает дедупликацию при инкрементах
 - Hadoop HDFS и Spark избыточны при таком масштабе
 - S3 — только для хранения артефактов MLflow (опционально)
+
+## Экспорт в onnx
+```bash
+cd onnx
+python export.py
+```
+
+## Запуск сервиса bentoml
+```bash
+cd bentoml
+bentoml serve service.py
+```
+## Нагрузочное тестирование с locust
+```bash
+cd locust
+# 10 пользователей, скорость спауна 2/сек, длительность 2 минуты
+locust -f locustfile.py --host http://localhost:3000 -u 10 -r 2 -t 120s --html report.html
+```
+
+## Grafana
+```bash
+cd monitoring
+docker compose up -d
+```
+Логин admin пароль admin

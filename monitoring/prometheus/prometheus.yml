@@ -1,0 +1,18 @@
+global:
+  scrape_interval: 10s
+  evaluation_interval: 10s
+  external_labels:
+    monitor: 'bentoml-monitor'
+
+scrape_configs:
+  # BentoML Service metrics
+  - job_name: 'bentoml-service'
+    metrics_path: '/metrics'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['host.docker.internal:3000']  # Для Docker Desktop на Mac/Windows
+        # Для Linux используйте: ['172.17.0.1:3000'] или ['host.docker.internal:3000'] с extra_hosts
+    metric_relabel_configs:
+      # Опционально: добавляем метку environment
+      - target_label: environment
+        replacement: 'development'
