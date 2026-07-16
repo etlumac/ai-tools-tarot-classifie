@@ -232,25 +232,26 @@ poetry run mlflow ui --port 5000
 - Hadoop HDFS и Spark избыточны при таком масштабе
 - S3 — только для хранения артефактов MLflow (опционально)
 
-## Экспорт в onnx
+
+## 5. Экспорт в onnx (Лаб 3)
 ```bash
 cd onnx
 python export.py
 ```
 
-## Запуск сервиса bentoml
+## 6. Запуск сервиса bentoml (Лаб 3)
 ```bash
 cd bentoml
 bentoml serve service.py
-```
-## Нагрузочное тестирование с locust
+``` 
+## 7. Нагрузочное тестирование с locust (Лаб 3)
 ```bash
 cd locust
 # 10 пользователей, скорость спауна 2/сек, длительность 2 минуты
 locust -f locustfile.py --host http://localhost:3000 -u 10 -r 2 -t 120s --html report.html
 ```
 
-## Grafana
+## 8. Grafana (Лаб 3)
 ```bash
 cd monitoring
 docker compose up -d
